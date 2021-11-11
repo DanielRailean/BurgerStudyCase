@@ -6,13 +6,18 @@ Container(burgerApp, "Web Application", ".NET Blazor","Provides all of the burge
 Container(burgerMobile, "Mobile App", "Xamarin","Provides all of the burger app functionatity to customers via their mobile device")
 
 System_Boundary(c1, "API Application"){
-    Container(loginController, "Log In/Out Controller", ".NET MVC Controller","Allows users to log in/out to the Burger App")
+    Container(loginController, "Auth Controller", ".NET MVC Controller","Allows users to log in/out to the Burger App")
     Container(restaurantsController, "Restaurants Controller", ".NET MVC Controller","Allows users to search for restaurants")
     Container(postsController, "Posts Controller", ".NET MVC Controller","Allows users to register to the Burger App")
 
-    Container(googleAPIService, "Google Places API Service", ".NET HttpClient","A facade onto the Google places API")
+    Container(googleAPIService, "Restaurants Service", ".NET HttpClient","A facade onto the Google places API")
     Container(postsDataService, "User Posts Data Service", "EF DbContext","A wrapper of the users Posts in the DB")
-    Container(securityService, "Security Service", "EF DbContext","Provides functionality related logging in and out , etc.")
+    Container(userService, "User Service", "C#","Provides functionality related user (registration, log in , etc)")
+
+    Container(userDbContext, "User Credentials DB Context", "EF DbContext","Links DB to EF Core")
+    Container(userContentDbContext, "User Content DB Context", "EF DbContext","Links DB to EF Core")
+    Container(securityService, "Security Service", "C#","Provides functionality related logging in and out , etc.")
+    Container(authService, "Auth Service", "C#","Provides functionality related user authorization , etc.")
 }
 
 
@@ -30,9 +35,17 @@ Rel(burgerMobile, postsController, "Makes API Calls to","JSON/HTTPS")
 
 Rel(restaurantsController,googleAPIService,"Uses")
 Rel(postsController,postsDataService,"Uses")
-Rel(loginController,securityService,"Uses")
+Rel(loginController,userService,"Uses")
+Rel(userService,securityService,"Uses")
+Rel(userService,userDbContext,"Uses")
+
+Rel(userService,authService,"Uses")
+Rel(postsDataService,authService,"Uses")
+Rel(googleAPIService,authService,"Uses")
 
 Rel(googleAPIService,googleAPI,"Uses","JSON/HTTPS")
-Rel(postsDataService,userContentDB,"Reads and writes to ","EF Core")
-Rel(securityService,burgerDB,"Reads and writes to ","EF Core")
+Rel(postsDataService,userContentDbContext,"Reads and writes to ","EF Core")
+
+Rel(userDbContext,burgerDB,"Reads and writes to ","EF Core")
+Rel(userContentDbContext,userContentDB,"Reads and writes to ","EF Core")
 @enduml
