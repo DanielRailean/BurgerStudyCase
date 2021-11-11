@@ -1,0 +1,10 @@
+@startuml
+!include https://raw.githubusercontent.com/kirchsth/C4-PlantUML/extended/C4_Container.puml
+
+Person(burgerUser, "Burger Backend Customer", "The actual burger lover")
+Container(burgerApp, "Burger Social Platform", "Software System", "Allows customer to review burger places and finid nearby restaurents with burger.")
+Container(googlePlaces, "Google Places API", "Software System", "Provides info about nearby restaurands serving burghers.")
+
+Rel(burgerUser, burgerApp, "Reviews burger places, uploads pictures, finds restaurants using")
+Rel(burgerApp, googlePlaces, "Gets restaurants info based on current user position using")
+@enduml
