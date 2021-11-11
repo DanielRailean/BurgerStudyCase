@@ -1,0 +1,11 @@
+Servers will need to share same refresh and access token keys
+ to be able to server user requests no matter which server 
+ the request is forwarded to 
+
+SQlite wil be used for the ease of implementation ,
+ in production should be swapped with Oracle SQLServer or 
+ any other db that supports concurrency.
+
+DBs then would be scaled horisontaly and split for ex at 10k users.
+
+Images would be stored in a separate container / service and in Users content db only or image src would be included.

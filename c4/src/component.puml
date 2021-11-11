@@ -1,0 +1,38 @@
+@startuml
+!include https://raw.githubusercontent.com/kirchsth/C4-PlantUML/extended/C4_Container.puml
+
+
+Container(burgerApp, "Web Application", ".NET Blazor","Provides all of the burger app functionatity to customers via their web browser")
+Container(burgerMobile, "Mobile App", "Xamarin","Provides all of the burger app functionatity to customers via their mobile device")
+
+System_Boundary(c1, "API Application"){
+    Container(loginController, "Log In/Out Controller", ".NET MVC Controller","Allows users to log in/out to the Burger App")
+    Container(restaurantsController, "Restaurants Controller", ".NET MVC Controller","Allows users to search for restaurants")
+    Container(postsController, "Posts Controller", ".NET MVC Controller","Allows users to register to the Burger App")
+
+    Container(googleAPIService, "Google Places API Service", ".NET HttpClient","A facade onto the Google places API")
+    Container(postsDataService, "User Posts Data Service", "EF DbContext","A wrapper of the users Posts in the DB")
+    Container(securityService, "Security Service", "EF DbContext","Provides functionality related logging in and out , etc.")
+}
+
+
+ContainerDb(burgerDB, "Relational Database", "SQLite 3", "Stores user registration information, salted and hashed authentication credentials, valid users refresh tokens")
+ContainerDb(userContentDB, "Relational Database", "SQLite 3", "Stores user posted burger content.")
+
+System(googleAPI,"Google Places API", "Provides info about nearby restaurands serving burghers." )
+
+Rel(burgerApp, loginController, "Makes API Calls to","JSON/HTTPS")
+Rel(burgerMobile, loginController, "Makes API Calls to","JSON/HTTPS")
+Rel(burgerApp, restaurantsController, "Makes API Calls to","JSON/HTTPS")
+Rel(burgerMobile, restaurantsController, "Makes API Calls to","JSON/HTTPS")
+Rel(burgerApp, postsController, "Makes API Calls to","JSON/HTTPS")
+Rel(burgerMobile, postsController, "Makes API Calls to","JSON/HTTPS")
+
+Rel(restaurantsController,googleAPIService,"Uses")
+Rel(postsController,postsDataService,"Uses")
+Rel(loginController,securityService,"Uses")
+
+Rel(googleAPIService,googleAPI,"Uses","JSON/HTTPS")
+Rel(postsDataService,userContentDB,"Reads and writes to ","EF Core")
+Rel(securityService,burgerDB,"Reads and writes to ","EF Core")
+@enduml
