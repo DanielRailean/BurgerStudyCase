@@ -1,2 +1,3 @@
 30 min - learning about c4 model.
 1h 30 min - Designing system context and container diagrams.
+2h 20 min (12:20) - Designing component and updating container diagrams.
