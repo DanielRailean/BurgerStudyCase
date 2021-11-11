@@ -11,14 +11,14 @@ namespace MoneyTrackDatabaseAPI.Services
     public class TokenServiceJson : ITokenService
         {
             private string TokensFile = "Tokens.json";
-            private IList<AuthModel> AllTokens;
+            private IList<string> AllTokens;
 
             public TokenServiceJson()
             {
                 if (File.Exists(TokensFile))
                 {
                     string TokensInJSON = File.ReadAllText(TokensFile);
-                    AllTokens = JsonSerializer.Deserialize<IList<AuthModel>>(TokensInJSON);
+                    AllTokens = JsonSerializer.Deserialize<IList<String>>(TokensInJSON);
                 }
                 else
                 {
@@ -28,7 +28,7 @@ namespace MoneyTrackDatabaseAPI.Services
             }
             private void Seed()
             {
-                IList<AuthModel> Tokens = new List<AuthModel>();
+                IList<string> Tokens = new List<String>();
                 AllTokens = Tokens.ToList();
             }
 
@@ -38,27 +38,17 @@ namespace MoneyTrackDatabaseAPI.Services
                 File.WriteAllText(TokensFile, TokensInJson);
             }
 
-            public async Task AddToken(AuthModel token)
+            public async Task AddToken(string token)
             {
                 AllTokens.Add(token);
                 Save();
             }
+            
 
-            public async Task RemoveAllForUser(int userId)
-            {
-                var check = AllTokens.Where((s => s.UserId==userId)).ToList();
-                Console.WriteLine(JsonSerializer.Serialize(check));
-                foreach (var item in check)
-                {
-                    AllTokens.Remove(item);
-                    Save();
-                }
-                
-            }
 
-            public async Task Logout(AuthModel token)
+            public async Task Logout(string token)
             {
-                var check = AllTokens.FirstOrDefault(s => s.UserId==token.UserId && s.exp==token.exp);
+                var check = AllTokens.FirstOrDefault(s => s.Equals(token));
                 if (check != null)
                 {
                     AllTokens.Remove(check);
@@ -70,9 +60,9 @@ namespace MoneyTrackDatabaseAPI.Services
                 }
             }
 
-            public async Task<bool> ContainsToken(AuthModel token)
+            public async Task<bool> ContainsToken(string token)
             {
-                var check = AllTokens.FirstOrDefault((s => s.UserId==token.UserId&&s.exp==token.exp));
+                var check = AllTokens.FirstOrDefault(s=>s.Equals(token));
                 if(check!=null)
                 {
                     return true;

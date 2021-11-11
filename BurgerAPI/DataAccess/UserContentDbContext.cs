@@ -5,7 +5,8 @@ namespace MoneyTrackDatabaseAPI.DataAccess
 {
     public class UserContentDbContext : DbContext
     {
-        public DbSet<User> Users { get; set; }
+        public DbSet<Restaurant> Restaurants { get; set; }
+        public DbSet<Post> Posts { get; set; }
         
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

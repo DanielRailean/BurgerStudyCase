@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using JWT;
 using JWT.Algorithms;
@@ -14,27 +15,43 @@ namespace MoneyTrackDatabaseAPI.Services
         private string secretRefresh;
         public AuthModel AuthModel { get; set; }
         public bool IsTokenValid { get; set; }
-        public AuthService()
+        private ITokenService tokenService;
+        private int refreshTokenTTL;
+        private int accessTokenTTL;
+
+        public AuthService( ITokenService tokenService)
         {
             secretAccess = Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET");
             secretRefresh = Environment.GetEnvironmentVariable("REFRESH_TOKEN_SECRET");
+            refreshTokenTTL = int.Parse(Environment.GetEnvironmentVariable("REFRESH_TOKEN_TTL"));
+            accessTokenTTL = int.Parse(Environment.GetEnvironmentVariable("ACCESS_TOKEN_TTL"));
+            this.tokenService = tokenService;
+
             AuthModel = null;
             IsTokenValid = false;
         }
 
-        public async Task<string> GenerateAccessToken(AuthModel model)
+        public async Task<string> GenerateAccessToken(string refreshToken)
         {
+            if (!await tokenService.ContainsToken(refreshToken))
+                return null;
+
+            var payload = await GetPayloadRefresh(refreshToken);
+            var newPayload = new AuthModel(payload.UserId, accessTokenTTL);
+            
             IJwtAlgorithm algorithm = new HMACSHA512Algorithm();
             IJsonSerializer serializer = new JsonNetSerializer();
             IBase64UrlEncoder urlEncoder = new JwtBase64UrlEncoder();
             IJwtEncoder encoder = new JwtEncoder(algorithm, serializer, urlEncoder);
 
-            var token = encoder.Encode(model, secretAccess);
+            var token = encoder.Encode(newPayload, secretAccess);
             return token;
         }
 
-        public async Task<string> GenerateRefreshToken(AuthModel model)
+        public async Task<string> GenerateRefreshToken(int userId)
         {
+         
+            var model = new AuthModel(userId, refreshTokenTTL);
             IJwtAlgorithm algorithm = new HMACSHA512Algorithm();
             IJsonSerializer serializer = new JsonNetSerializer();
             IBase64UrlEncoder urlEncoder = new JwtBase64UrlEncoder();

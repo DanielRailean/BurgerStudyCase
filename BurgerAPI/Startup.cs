@@ -14,9 +14,10 @@ using Microsoft.OpenApi.Models;
 using MoneyTrackDatabaseAPI.Controllers.Middleware;
 using MoneyTrackDatabaseAPI.Data;
 using MoneyTrackDatabaseAPI.DataAccess;
+using MoneyTrackDatabaseAPI.Models;
 using MoneyTrackDatabaseAPI.Services;
 
-namespace MoneyTrackDatabaseAPI
+namespace BurgerAPI
 {
     public class Startup
     {
@@ -36,9 +37,12 @@ namespace MoneyTrackDatabaseAPI
         {
             services.AddControllers();
             services.AddDbContext<UserCredentialsDbContext>();
+            services.AddDbContext<UserContentDbContext>();
             services.AddScoped<IUserService, UserServiceSqlite>();
+            services.AddScoped<IPostsService, PostServiceSqlite>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddSingleton<ITokenService, TokenServiceJson>();
+            services.AddSingleton<SecurityService>();
             services.AddCors(
                 options =>
             {
